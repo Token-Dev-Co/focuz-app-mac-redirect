@@ -15,17 +15,12 @@
     <script>
         window.onload = function () {
             // --- SECURITY CHECKS ---
-
-            // 1. Verify Referrer (Must come from Stripe)
-            // Note: Some privacy extensions might block this, so use with caution or as a 'soft' check.
             const referrer = document.referrer;
             const isFromStripe = referrer.includes("stripe.com");
 
-            // 2. Verify Shared Secret
             const urlParams = new URLSearchParams(window.location.search);
-            const secret = urlParams.get('key'); // Use a generic name like 'key' or 'token'
+            const secret = urlParams.get('key');
 
-            // REPLACE THIS with your own long, random string
             const MY_SECRET = '91a0ffb585392eeaaf7b497d942baa2dee03bf7b29cdc71c770da0fb9908fbde';
 
             if (secret === MY_SECRET && isFromStripe) {
@@ -35,10 +30,27 @@
                 // Redirect to App
                 window.location.href = "zf://upgrade-success";
 
-                // Attempt to close window immediately
-                window.opener = null;
-                window.open("", "_self");
-                window.close();
+                // Aguardar um momento para que o redirecionamento seja processado
+                // e então fechar a janela
+                setTimeout(() => {
+                    // Método 1: Tentar fechar normalmente
+                    try {
+                        window.close();
+                    } catch (e) {
+                        // Se falhar, tentar métodos alternativos
+                        console.log("Tentando método alternativo para fechar janela...");
+                        
+                        // Método 2: Abrir uma URL vazia no mesmo contexto
+                        window.open('', '_self', '');
+                        window.close();
+                        
+                        // Método 3: Para alguns navegadores, tentar com um pequeno delay
+                        setTimeout(() => {
+                            window.close();
+                        }, 100);
+                    }
+                }, 100); // Aguardar 100ms para o redirecionamento
+                
             } else {
                 // Failed
                 console.error("Access denied. Referrer:", referrer);
