@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing...</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            // --- SECURITY CHECKS ---
+
+            // 1. Verify Referrer (Must come from Stripe)
+            // Note: Some privacy extensions might block this, so use with caution or as a 'soft' check.
+            const referrer = document.referrer;
+            const isFromStripe = referrer.includes("stripe.com");
+
+            // 2. Verify Shared Secret
+            const urlParams = new URLSearchParams(window.location.search);
+            const secret = urlParams.get('key'); // Use a generic name like 'key' or 'token'
+
+            // REPLACE THIS with your own long, random string
+            const MY_SECRET = '91a0ffb585392eeaaf7b497d942baa2dee03bf7b29cdc71c770da0fb9908fbde';
+
+            if (secret === MY_SECRET && isFromStripe) {
+                // Success!
+                document.body.innerHTML = "<h1>Finalizing...</h1>";
+
+                // Redirect to App
+                window.location.href = "zf://upgrade-success";
+
+                // Attempt to close window
+                setTimeout(function () { window.close(); }, 2000);
+            } else {
+                // Failed
+                console.error("Access denied. Referrer:", referrer);
+                document.body.innerHTML = "<h1>403 Forbidden</h1><p>Invalid access token.</p>";
+            }
+        };
+    </script>
+</head>
+
+<body>
+    <p>Please wait...</p>
+</body>
+
+</html>
